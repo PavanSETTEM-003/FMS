@@ -1,0 +1,99 @@
+body{
+    font-family: 'Press Start 2P', system-ui;
+    background-color: black;
+    color: white;
+    padding: 30px;
+}
+
+::placeholder{
+    color: black;
+}
+
+/* .pixel-star{
+    width: 30;
+     height: 30
+} */
+
+/* Centered container */
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+/* Hide dropdown content by default */
+.dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease; /* Smooth animation for max-height */
+  }
+  
+  /* Show dropdown content when the dropdown is active */
+  .dropdown.active .dropdown-content {
+    display: block;
+    max-height: 100vh; /* Adjust the max-height as needed */
+  }
+  
+
+  /* .inc-exp-container {
+    background-color: #fff;
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+  }
+  
+  .inc-exp-container > div {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .inc-exp-container > div:first-of-type {
+    border-right: 1px solid #dedede;
+  } */
+  
+  label {
+    display: inline-block;
+    margin: 10px;
+    width: 100%;
+  }
+  
+  input[type='text'],
+  input[type='number'] {
+    background-color: slategray;
+    border: 1px solid #dedede;
+    border-radius: 2px;
+    display: block;
+    font-size: 16px;
+    padding: 10px;
+    width: 92%;
+    border-radius: 10px;
+  }
+  
+  .btn {
+    color: black;
+    font-weight: bolder;
+    background-color: #A5FFD6;
+    border-radius: 10px;
+    cursor: pointer;
+    display: inline-block;
+    margin: 10px 0;
+    padding: 10px;
+    width: 100%;
+  }
+  
+  .btn:hover {
+    background-color: #FFA69E;
+    border-radius: 10px;
+    
+  }
+
+
+  #tracker_form input{
+    margin: 10px;
+  }
+
+
+
