@@ -38,8 +38,7 @@
     </main>
 
 
-
-    <h1 id="Total_Amount" style="text-align: center; margin: auto; padding-top: 50px;">543</h1><br>
+    <h1 id="Total_Amount_container" style="text-align: center; margin: auto; padding-top: 50px;"></h1><br>
 
     <div class="expense_tracker">
         <h3>New transaction</h3>
@@ -119,29 +118,55 @@
             formdata.append("mode", mode);
             formdata.append("price", price);
 
-            response_message = await fetch("/insert_expense", {
+            submitExpenses_return = await fetch("/insert_expense", {
                 method: "POST",
                 body: formdata,
             })
                 .then(response => response.json())
-                .then(response => response.message)
                 .catch(error => {
                     console.error('Error:', error);
                     return 0;
                 });
 
             var successMessage = document.getElementById('successMessage');
+            var Total_Amount = document.getElementById("Total_Amount_container")
             console.log(response_message)
             if (successMessage) 
             {
-                successMessage.textContent = response_message; // Assuming the server sends a 'message' key
+                successMessage.textContent = submitExpenses_return.message; // Assuming the server sends a 'message' key
                 successMessage.style.color = 'green';
-                document.getElementById('expense_tracker_form').reset(); // Assuming your form has an id of 'expenseForm'
                 } 
                 else {
-                console.error('Error: Element with ID "successMessage" not found');
-            }
+                console.error('Error: Element with ID "successMessage" not found');}
+            
+            if (Total_Amount){
+                Total_Amount.textContent = submitExpenses_return.amount_this_month;
+                Total_Amount.style.color = 'white';
+                }
+                else {
+                console.error('Error: Element with ID "Total_Amount_container" not found');}
+
+            document.getElementById('expense_tracker_form').reset(); 
         }
+
+        window.onload = function() {
+            fetch('/fetch_amount')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+
+                    var Total_Amount = document.getElementById("Total_Amount_container")
+                    if (Total_Amount){
+                        Total_Amount.textContent = data.amount_this_month;
+                        Total_Amount.style.color = 'white';
+                        }
+                        else {
+                        console.error('Error: Element with ID "Total_Amount_container" not found')}
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        };
 
         document.getElementById('tracker_form').addEventListener('submit', submitTasks);
         document.getElementById('expense_tracker_form').addEventListener('submit', submitExpenses);
