@@ -2,7 +2,7 @@ from datetime import datetime
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 
 from pymongo import MongoClient
 from dotenv import dotenv_values
@@ -19,7 +19,11 @@ def connect_database():
         app.Tracker_Collection = app.database[config["Tracker_collection_name"]]
         app.Summary_Collection = app.database[config["Summary_collection_name"]]
 
+        app.user_database = app.mongodb_client[config["User_DB_Name"]]
+        app.users_collection = app.user_database[config["User_collection"]]
+
         print("Connected to the MongoDB database!")
+
     except Exception as e:
         print(f"Unable to connect to the database: {e}")
 
@@ -54,9 +58,69 @@ def Update_Expenses_Summary(current_date, expenses):
     except Exception as error:
         print("Func_'Update_Expenses_Summary' :",error)
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/home", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/",response_class=HTMLResponse)
+async def login(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.post("/validate_login", response_class=HTMLResponse)
+async def validate_login(request: Request):
+    details= await request.form()
+    user_email = details.get("Email")
+    user_password  = details.get("Password")
+    # By default, let's consider the user is new
+    login_status = False
+    login_message = "Oops! Please create your profile."
+
+    if user_email:
+        # Check if the user exists in the database
+        validate = app.users_collection.find_one({"Email": user_email})
+
+        if validate is not None:
+            if validate["Password"] == user_password:
+                login_status = True
+                login_message = "Welcome back ❤"
+            else:
+                login_status = False
+                login_message = "please check password 👀"
+
+    res = {
+        "LoginStatus": login_status,
+        "LoginMessage": login_message
+    }
+
+    return JSONResponse(content = res)
+
+@app.get("/signin",response_class=HTMLResponse)
+async def login(request: Request):
+    return templates.TemplateResponse("signin.html", {"request": request})
+
+@app.post("/validate_signin", response_class=HTMLResponse)
+async def User_Signin(request: Request):
+    details = await request.form()
+    user_email = details.get("Email")
+    # By default, let's consider the user is already had an account
+    SigninStatus = False
+    SigninMessage = "Email id already exists"
+
+    if user_email:
+        validate = app.users_collection.find_one({"Email": user_email})
+
+        if validate is None:
+            details = {key: value for key, value in details.items()}
+            app.users_collection.insert_one(details)
+            SigninStatus = True
+            SigninMessage = "Welcome to the world"
+
+    res = {
+        "SigninStatus" : SigninStatus,
+        "SigninMessage" : SigninMessage
+    }
+
+    return JSONResponse(content=res)
 
 @app.get("/fetch_amount")
 async def fetch_amount(request: Request):
@@ -106,7 +170,7 @@ async def insert_task(request: Request):
     try:
         tasks_received = await request.form()
         tasks_dict = {key: value for key, value in tasks_received.items()}
-        print(tasks_dict)
+        #print(tasks_dict)
 
         current_date = datetime.now().strftime("%d-%m-%Y")
         existing_document = app.Tracker_Collection.find_one({"Date": current_date})

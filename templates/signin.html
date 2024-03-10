@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeveL Up</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <section>
+        <div class="container">
+
+            <div class="Character" style="margin-bottom: 0;">
+                <img class="Character_shadow pixelart"
+                    src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/21542/DemoRpgCharacterShadow.png" alt="Shadow" />
+                <img class="Character_spritesheet pixelart face-down"
+                    src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/21542/DemoRpgCharacter.png" alt="Character" />
+            </div>
+
+            <h1 class="text-light display-4 text-center">Forge your <span style="color: rgb(105, 171, 222);"> Best Self</span></h1>
+
+            <form id="Signin_form" action="/validate_login" method="post">
+                <label for="Username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="Username" placeholder="Enter Username"
+                    style="color: white;">
+
+                <label for="Email" class="form-label">Email</label>
+                <input type="text" class="form-control" id="Email" placeholder="Enter Email"
+                    style="color: white; background-color: transparent;">
+
+                <label for="Password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="Password" placeholder="Enter Password"
+                    style="color: white;">
+
+                <label for="Confirm_Password" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="Confirm_Password" placeholder="Re-enter Password"
+                    style="color: white;"><br>
+
+                <div id="SigninMessage"></div>
+
+                <a href="/" class="text-light" style="text-decoration: none;">Already have an
+                    Account ?</a><br><br>
+                <button type="submit" class="btn" id="submitButton">Start Your Journey!</button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        async function Submit_Signin(event) {
+            event.preventDefault()
+
+            // Get form values
+            var Username = document.getElementById("Username").value;
+            var Email = document.getElementById("Email").value;
+            var Password = document.getElementById("Password").value;
+
+            // Create FormData object
+            var formdata = new FormData();
+            formdata.append("Username", Username);
+            formdata.append("Email", Email);
+            formdata.append("Password", Password);
+
+
+            Signin_return = await fetch("/validate_signin", {
+                method: "POST",
+                body: formdata,
+            })
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error:', error);
+                    return 0;
+                });
+
+            console.log(Signin_return)
+
+            if (Signin_return.SigninStatus) {
+                window.location.href = "/home";
+            }
+
+            else {
+                SigninMessage.textContent = Signin_return.SigninMessage;
+                SigninMessage.style.color = 'red';
+            }
+
+            ocument.getElementById('Signin_form').reset();
+
+        }
+
+        document.getElementById('Signin_form').addEventListener('submit', Submit_Signin);
+
+        const passwordInput = document.getElementById('Password');
+        const confirmPasswordInput = document.getElementById('Confirm_Password');
+        const submitButton = document.getElementById('submitButton');
+
+        passwordInput.addEventListener('input', validatePassword);
+        confirmPasswordInput.addEventListener('input', validatePassword);
+
+        function validatePassword() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (password === confirmPassword) {
+                SigninMessage.textContent = "Confirm Password"
+                submitButton.disabled = false;
+            } else {
+                submitButton.disabled = true;
+            }
+        }
+    </script>
+
+</body>
+
+</html>
