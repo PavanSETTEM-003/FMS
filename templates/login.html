@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeveL Up</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <section>
+        <div class="container">
+
+            <div class="Character">
+                <img class="Character_shadow pixelart"
+                    src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/21542/DemoRpgCharacterShadow.png" alt="Shadow" />
+                <img class="Character_spritesheet pixelart face-down"
+                    src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/21542/DemoRpgCharacter.png" alt="Character" />
+            </div>
+
+            <h1 class="text-light display-4 text-center">LeveL Up Your Journey!</h1>
+            <p class="text-light lead text-center">Enter your credentials</p>
+
+            <form id="login_form" action="/validate_login" method="post">
+                <label for="Email" class="form-label">Email</label>
+                <input type="text" class="form-control" id="Email" placeholder="Enter Email" style="color: white;">
+
+                <label for="Password" class="form-label">Password</label>
+                <input type="text" class="form-control" id="Password" placeholder="Enter Password"
+                    style="color: white;"><br>
+
+                <div id="LoginMessage"></div>
+
+                <a href="#!" class="text-light text-decoration-none">Forgot Password?</a><br><br>
+                <button type="submit" class="btn">
+                    <h3 style="margin: 0; font-weight: bolder;">Check In</h3>
+                </button>
+
+                <p class="text-light text-center mt-3">
+                    Don't have an account yet? <br>
+                    <a href="/signin" class="text-light fw-bold" style="text-decoration: none;">Create
+                        Your Hero!</a>
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        async function Submit_login(event) {
+            event.preventDefault()
+
+            // Get form values
+            var Email = document.getElementById("Email").value;
+            var Password = document.getElementById("Password").value;
+
+            // Create FormData object
+            var formdata = new FormData();
+            formdata.append("Email", Email);
+            formdata.append("Password", Password);
+
+            login_return = await fetch("/validate_login", {
+                method: "POST",
+                body: formdata,
+            })
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error:', error);
+                    return 0;
+                });
+
+            console.log(login_return)
+
+            if (login_return.LoginStatus === true) {
+                window.location.href = "/home";
+            }
+
+            else {
+                LoginMessage.textContent = login_return.LoginMessage;
+                LoginMessage.style.color = 'white';
+            }
+
+            document.getElementById('login_form').reset();
+
+        }
+
+        document.getElementById('login_form').addEventListener('submit', Submit_login);
+    </script>
+
+</body>
+
+</html>
